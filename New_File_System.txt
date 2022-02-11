@@ -1,0 +1,257 @@
+Steps for creating from scratch:
+• git init
+• npm init -y
+• touch .gitignore
+	•node_modules
+	•.DS_Store
+	•dist/
+	•coverage/
+		•git add .gitignore
+		•git commit -m "add .gitignore"
+• mkdir src
+• mkdir src/css
+• touch src/css/styles.css
+• touch src/index.html 
+• touch src/index.js
+// Any other files you add here be sure to import later
+
+// add packages
+**Configuring Webpack**
+• npm install webpack@4.39.3 --save-dev --save-exact
+• npm install webpack-cli@3.3.8 --save-dev
+• touch webpack.config.js 
+	• contents:
+	const path = require('path');
+
+	module.exports = {
+	  entry: './src/index.js',
+	  output: {
+	    filename: 'bundle.js',
+	    path: path.resolve(__dirname, 'dist')
+	  }
+	};
+
+• Add "build": "webpack" to package.json		// npm run build here should create dist directory with no errors
+**Bundleing Javascript** 				// Importing and exporting skipped here and applied where applicable
+**Bundleing CSS**
+• npm install style-loader@1.0.0 css-loader@3.2.0 --save-dev
+• Update webpack.config.js to:
+
+	const path = require('path');
+
+	module.exports = {
+	  entry: './src/index.js',
+	  output: {
+	    filename: 'bundle.js',
+	    path: path.resolve(__dirname, 'dist')
+	  },
+	  module: {
+	    rules: [
+	      {
+	        test: /\.css$/,
+	        use: [
+	          'style-loader',
+	          'css-loader'
+	        ]
+	      }
+	    ]
+	  }
+	};
+
+**Processing HTML**
+• npm install html-webpack-plugin@3.2.0 --save-dev
+• Update webpack.config.js to:
+
+	const path = require('path');
+	const HtmlWebpackPlugin = require('html-webpack-plugin');
+	
+	module.exports = {
+	  entry: './src/index.js',
+	  output: {
+	    filename: 'bundle.js',
+	    path: path.resolve(__dirname, 'dist')
+	  },
+	  plugins: [
+	    new HtmlWebpackPlugin({
+	      title: 'Shape Tracker',
+	      template: './src/index.html',
+	      inject: 'body'
+	    })
+	  ],
+	  module: {
+	    rules: [
+	      {
+	        test: /\.css$/,
+	        use: [
+	          'style-loader',
+	          'css-loader'
+	        ]
+	      }
+	    ]
+	  }
+	};
+
+• Now that we have injected HtmlWebpackPlugin into the body we can import our created files to index.js and we won't need to link them in <head>
+• Update index.js:
+	import './css/styles.css';
+	...
+	plugins: [
+    		new CleanWebpackPlugin(), // new line
+    		new HtmlWebpackPlugin({
+      		  title: 'Shape Tracker',
+
+**Cleaning up**
+• npm install clean-webpack-plugin@3.0.0 --save-dev
+• Update webpack.config.js
+	const { CleanWebpackPlugin } = require('clean-webpack-plugin'); // To top with variable declarations
+
+		module.exports = {
+  	entry: './src/index.js',
+  	output: {
+    	filename: 'bundle.js',
+    	path: path.resolve(__dirname, 'dist')
+  	},
+  	devtool: 'eval-source-map',  // new line
+  	devServer: {                 // new line
+    	contentBase: './dist'      // new line
+  	},
+• Update package.json
+	...
+  	   "scripts": {
+    	   "build": "webpack",
+    	   "start": "webpack-dev-server --open"
+  	   },
+	...
+
+**Linting Code**
+• npm install clean-webpack-plugin@3.0.0 --save-dev
+• Update webpack.config.js to
+	• At top under other variable declarations
+	const { CleanWebpackPlugin } = require('clean-webpack-plugin');
+	• in plugins: [
+	new CleanWebpackPlugin(), // new line
+	new HtmlWebpackPlugin({
+	...
+
+**Development Server**
+• npm install webpack-dev-server@3.8.0 --save-dev --save-exact
+• update webpack.config.js
+	module.exports = {
+	  entry: './src/index.js',
+	  output: {
+	    filename: 'bundle.js',
+	    path: path.resolve(__dirname, 'dist')
+	  },
+	  devtool: 'eval-source-map',  // new line
+	  devServer: {                 // new line
+	    contentBase: './dist'      // new line
+	  },
+
+• Update package.json
+	...
+	  "scripts": {
+	    "build": "webpack",
+	    "start": "webpack-dev-server --open" 
+	  },
+	...
+
+• Add --mode development to "build" in package.json
+	...
+	  "scripts": {
+	    "build": "webpack --mode development",
+	    "start": "webpack-dev-server --open --mode development"
+	  },
+	...
+
+• Update "start" in package.json 	//now it will run build when calling npm run start
+	"start": "npm run build; webpack-dev-server --open --mode development"
+
+**LINTING** 		//visit hw for info on adding or changing rules
+• npm install eslint@7.32.0 --save-dev
+• npm install eslint-loader@4.0.2 --save-dev
+• Update webpack.config.js to:
+
+	module.exports = {
+	  ...
+	  module: {
+	    rules: [
+	      {
+	        test: /\.css$/,
+	        use: [
+	          'style-loader',
+	          'css-loader'
+	        ]
+	      },
+	      {
+	        test: /\.js$/,
+	        exclude: /node_modules/,
+	        loader: "eslint-loader"
+	      }
+	    ]
+	  }
+	};
+• touch .eslintrc   	//in the root directory
+	•contents
+	{
+	    "parserOptions": {
+	        "ecmaVersion": 2018,
+	        "sourceType": "module"
+	    },
+	    "extends": "eslint:recommended",
+	    "env": {
+	      "es6": true,
+	      "browser": true,
+	      "jquery": true,
+	      "node": true
+	    },
+	    "rules": {
+	        "semi": 1,
+	        "indent": ["warn", 2]
+	    }
+	}
+• Update package.json to include:
+	...
+	"start": "npm run build; webpack-dev-server --open --mode development",
+    	"lint": "eslint src/*.js"  //new line
+  	},	
+
+**Adding frontend dependencies** //bootstrap and jquery
+• npm install jquery
+• Update index.js:
+	•import $ from 'jquery';
+
+• npm install @popperjs/core --save-dev
+• npm install bootstrap
+• Update index.js
+	import 'bootstrap';
+	import 'bootstrap/dist/css/bootstrap.min.css';
+	import './css/styles.css';
+
+**Jest**
+• npm instlal jest@24.9.0 --save-dev
+• Update package.json 
+	...
+	lint": "eslint src/*.js",
+    	"test": "jest"
+	}
+	...
+
+• mkdir __tests__
+// To add a test file for a specific js file it's : filename.test.js
+**Babel**
+• npm install @babel/core@7.6.4 --save-dev
+• npm install @babel/plugin-transform-modules-commonjs@7.6.0 --save-dev
+• touch .babelrc 	//in root directory
+	•contains:
+	{
+	  "env": {
+	    "test": {
+	      "plugins": ["@babel/plugin-transform-modules-commonjs"]
+	    }
+	  }
+	}
+
+To remove dependencies:
+• Delete the line from package.json first
+• npm prune //ensures that only dependencies in the manifest are installed
+If this doesnt work trash node_modules and run npm install again

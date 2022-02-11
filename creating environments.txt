@@ -1,0 +1,137 @@
+##Environment stuff
+
+### 
+
+    git init
+    mkdir src
+    touch .gitignore
+    touch README.md
+
+### Setup .gitignore
+
+    node_modules/
+    .DS_Store
+    dist/
+
+### Setup package.json
+
+Copy and edit old package.json or:
+
+    npm init -y
+
+### Install webpack
+
+    npm install webpack@4.39.3 --save-dev --save-exact
+    npm install webpack-cli@3.3.8 --save-dev
+
+### Configure webpack.config.js
+
+    const path = require('path');
+
+    module.exports = {
+      entry: './src/index.js',
+      output: {
+        filename: 'bundle.js',
+        path: path.resolve(__dirname, 'dist')
+      }
+    };
+
+### Bundle CSS
+
+    npm install style-loader@1.0.0 css-loader@3.2.0 --save-dev
+
+Update webpack.config.js:
+
+    module: {
+    rules: [
+        {
+          test: /\.css$/,
+          use: [
+            'style-loader',
+            'css-loader'
+          ]
+        }
+      ]
+    }
+
+### Bundle HTML
+
+    npm install html-webpack-plugin@3.2.0 --save-dev
+
+Update webpack.config.js:
+
+    plugins: [
+      new HtmlWebpackPlugin({
+        title: 'Shape Tracker',
+        template: './src/index.html',
+        inject: 'body'
+      })
+    ]
+
+### Install clean up
+
+    npm install clean-webpack-plugin@3.0.0 --save-dev
+
+Update webpack.config.js
+
+### Install webpack Development Server
+
+    qq
+
+Update webpack.config.js https://www.learnhowtoprogram.com/intermediate-javascript/test-driven-development-and-environments-with-javascript/cleaning-up
+
+Update package.json with script:
+
+    "start": "npm run build & webpack-dev-server --open --mode development",
+
+### Update package.json with mode
+
+    "build": "webpack --mode development",
+
+### Install eslint
+
+    npm install eslint@6.3.0 --save-dev
+    npm install eslint-loader@3.0.0 --save-dev
+
+Install `.eslintrc` in the directory 
+
+    {
+        "parserOptions": {
+            "ecmaVersion": 2018,
+            "sourceType": "module"
+        },
+        "extends": "eslint:recommended",
+        "env": {
+          "es6": true,
+          "browser": true,
+          "jquery": true,
+          "node": true
+        },
+        "rules": {
+            "semi": 1,
+            "indent": ["warn", 2]
+        }
+    }
+
+Update package.json with lint script: 
+
+    "lint": "eslint src/*.js"
+
+### Install jQuery
+
+    npm install jquery
+
+Add import to src/index.js
+
+    import $ from 'jquery';
+
+### Instrall Bootstrap
+
+    npm install @popperjs/core 
+    npm install bootstrap
+
+Import css files, including bootstrap, in index.js:
+
+    import 'bootstrap';
+    import 'bootstrap/dist/css/bootstrap.min.css';
+    import './css/styles.css';
